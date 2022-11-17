@@ -1,0 +1,17 @@
+solon.app:
+  name: pixiv-local-gallery
+solon.logging.appender:
+  console:
+    level: DEBUG
+    pattern: "%d{yyyy-MM-dd HH:mm:ss} %-5level %white(-) %-30(%cyan(%.32logger{30}:%L)) %msg%n"
+  file:
+    name: "logs/${solon.app.name}"
+    level: DEBUG
+    pattern: "%d{yyyy-MM-dd HH:mm:ss} %-5level - %-30(%.32logger{30}:%L) %msg%n"
+    maxFileSize: "10 MB"
+    maxHistory: "7"
+solon.logging.logger:
+  "root": #默认记录器配置
+    level: INFO
+  "nya.nekoneko.pixiv":
+    level: DEBUG
