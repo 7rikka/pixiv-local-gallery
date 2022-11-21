@@ -93,6 +93,19 @@ public class PixivClient {
         updateTime = LocalDateTime.now();
         printLoginInfo();
     }
+    public void getIllustIdDetail(int illustId){
+        //https://app-api.pixiv.net/v1/illust/detail?illust_id=10000000
+        //
+        Request request = PixivRequestFactory.getPixivRequest()
+                .url("https://app-api.pixiv.net/v1/illust/detail")
+                .addParam("illust_id",illustId)
+                .header("Authorization", "Bearer "+accessToken)
+                .buildRequest();
+        String result = Call.doCallGetString(request);
+        System.out.println(result);
+        ONode node = ONode.loadStr(result);
+        System.out.println(node.toJson());
+    }
     public void printLoginInfo(){
         log.info("==================");
         log.info("Pixiv登录信息：");
