@@ -59,4 +59,9 @@ public class Illust {
     private Integer illustBookStyle;
     @ONodeAttr(name = "comment_access_control")
     private Integer commentAccessControl;
+    @ONodeAttr(name = "create_time")
+    private LocalDateTime createTime;
+    @ONodeAttr(name = "update_time")
+    private LocalDateTime updateTime;
+    private String raw;
 }

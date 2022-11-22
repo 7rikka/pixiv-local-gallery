@@ -15,3 +15,22 @@ solon.logging.logger:
     level: INFO
   "nya.nekoneko.pixiv":
     level: DEBUG
+# 数据库
+demo.db1:
+  schema: pixiv
+  jdbcUrl: jdbc:mysql://localhost:3306/pixiv?useUnicode=true&characterEncoding=utf8&autoReconnect=true&rewriteBatchedStatements=true
+  driverClassName: com.mysql.cj.jdbc.Driver
+  username: root
+  password: 123456
+# 配置数据源对应的 mybatis 信息
+mybatis.db1:
+  typeAliases: #支持包名 或 类名（.class 结尾）
+    - "nya.nekoneko.pixiv.model"
+  mappers: #支持包名 或 类名（.class 结尾）或 xml（.xml结尾）
+    - "nya.nekoneko.pixiv.mapper"
+    - "mapper/*.xml"
+  configuration: #扩展配置（要与 Configuration 类的属性一一对应）
+    cacheEnabled: false
+    mapUnderscoreToCamelCase: true
+  globalConfig:
+    metaObjectHandler: nya.nekoneko.pixiv.config.MyMetaObjectHandler

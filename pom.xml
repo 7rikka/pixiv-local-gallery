@@ -44,6 +44,13 @@
             <artifactId>logback-solon-plugin</artifactId>
             <version>${solon.version}</version>
         </dependency>
+        <!--MyBatis Plus支持-->
+        <!-- https://mvnrepository.com/artifact/org.noear/mybatis-plus-solon-plugin -->
+        <dependency>
+            <groupId>org.noear</groupId>
+            <artifactId>mybatis-plus-solon-plugin</artifactId>
+            <version>${solon.version}</version>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
