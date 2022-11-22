@@ -13,7 +13,7 @@
         <maven.compiler.source>18</maven.compiler.source>
         <maven.compiler.target>18</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <solon.version>1.10.13</solon.version>
+        <solon.version>1.11.0</solon.version>
     </properties>
 
     <dependencies>
