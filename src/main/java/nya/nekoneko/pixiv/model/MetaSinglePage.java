@@ -12,8 +12,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Image_urls {
-    private String square_medium;
-    private String medium;
-    private String large;
+public class MetaSinglePage {
+    private String originalImageUrl;
 }

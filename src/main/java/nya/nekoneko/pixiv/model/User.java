@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.noear.snack.annotation.ONodeAttr;
 
 /**
  * @author Ho
@@ -16,6 +17,8 @@ public class User {
     private long id;
     private String name;
     private String account;
-    private Profile_image_urls profile_image_urls;
-    private boolean is_followed;
+    @ONodeAttr(name = "profile_image_urls")
+    private ProfileImageUrl profileImageUrls;
+    @ONodeAttr(name = "is_followed")
+    private boolean isFollowed;
 }

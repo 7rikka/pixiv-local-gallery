@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.noear.snack.annotation.ONodeAttr;
 
 /**
  * @author Ho
@@ -12,6 +13,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Meta_single_page {
-    private String original_image_url;
+public class ImageUrl {
+    @ONodeAttr(name = "square_medium")
+    private String squareMedium;
+    private String medium;
+    private String large;
 }

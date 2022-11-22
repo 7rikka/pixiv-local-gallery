@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.noear.snack.annotation.ONodeAttr;
 
 /**
  * @author Ho
@@ -14,5 +15,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Tags {
     private String name;
-    private String translated_name;
+    @ONodeAttr(name = "translated_name")
+    private String translatedName;
 }

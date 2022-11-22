@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Profile_image_urls {
+public class ProfileImageUrl {
     private String medium;
 }
