@@ -14,11 +14,11 @@ import org.noear.snack.annotation.ONodeAttr;
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
-    private long id;
+    private Integer id;
     private String name;
     private String account;
     @ONodeAttr(name = "profile_image_urls")
     private ProfileImageUrl profileImageUrls;
     @ONodeAttr(name = "is_followed")
-    private boolean isFollowed;
+    private Boolean isFollowed;
 }

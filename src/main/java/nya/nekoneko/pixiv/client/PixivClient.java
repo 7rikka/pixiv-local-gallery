@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nya.nekoneko.pixiv.model.Illust;
 import nya.nekoneko.pixiv.util.Call;
 import nya.nekoneko.pixiv.util.PixivRequestFactory;
 import nya.nekoneko.pixiv.util.TimeUtils;
@@ -93,7 +94,7 @@ public class PixivClient {
         updateTime = LocalDateTime.now();
         printLoginInfo();
     }
-    public void getIllustIdDetail(int illustId){
+    public Illust getIllustIdDetail(int illustId){
         //https://app-api.pixiv.net/v1/illust/detail?illust_id=10000000
         //
         Request request = PixivRequestFactory.getPixivRequest()
@@ -102,9 +103,11 @@ public class PixivClient {
                 .header("Authorization", "Bearer "+accessToken)
                 .buildRequest();
         String result = Call.doCallGetString(request);
-        System.out.println(result);
         ONode node = ONode.loadStr(result);
-        System.out.println(node.toJson());
+        Illust illust = node.get("illust").toObject(Illust.class);
+        LocalDateTime create_date = TimeUtils.toBeijingTime(node.get("illust").get("create_date").getRawString(), 9);
+        illust.setCreateDate(create_date);
+        return illust;
     }
     public void printLoginInfo(){
         log.info("==================");
