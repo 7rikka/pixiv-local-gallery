@@ -1,5 +1,6 @@
 package nya.nekoneko.pixiv.model;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -68,9 +69,12 @@ public class Illust {
     private Integer illustBookStyle;
     @ONodeAttr(name = "comment_access_control")
     private Integer commentAccessControl;
+    @TableField(value = "create_time",fill = FieldFill.INSERT)
     @ONodeAttr(name = "create_time")
     private LocalDateTime createTime;
+    @TableField(value = "update_time",fill = FieldFill.INSERT_UPDATE)
     @ONodeAttr(name = "update_time")
     private LocalDateTime updateTime;
+    private int state;
     private String raw;
 }

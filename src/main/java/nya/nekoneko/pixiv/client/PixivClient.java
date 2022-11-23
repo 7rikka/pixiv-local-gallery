@@ -136,19 +136,23 @@ public class PixivClient {
                 .addParam("illust_id", illustId)
                 .header("Authorization", "Bearer " + accessToken)
                 .buildRequest();
+//        String result = Call.doCallGetStringWithProxy(request);
         String result = Call.doCallGetString(request);
         ONode node = ONode.loadStr(result);
-        log.info("json:{}", node.toJson());
         if (!node.get("illust").isNull()) {
             Illust illust = node.get("illust").toObject(Illust.class);
             LocalDateTime createDate = TimeUtils.toBeijingTime(node.get("illust").get("create_date").getRawString(), 9);
             illust.setCreateDate(createDate);
             illust.setRaw(node.toJson());
+            illust.setState(0);
             return illust;
         } else {
             //{"error":{"user_message":"","message":"Rate Limit","reason":"","user_message_details":{}}}
-            
-            return null;
+            return Illust.builder()
+                    .id(illustId)
+                    .state(-1)
+                    .raw(node.toJson())
+                    .build();
         }
 
     }
