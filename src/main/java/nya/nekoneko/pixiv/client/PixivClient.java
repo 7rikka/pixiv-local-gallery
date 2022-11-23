@@ -19,18 +19,28 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
- *
+ * @author Ho
  */
 @Slf4j
 @NoArgsConstructor
 @AllArgsConstructor
 public class PixivClient {
-    private String accessToken;
-    private String refreshToken;
+    private volatile String accessToken;
+    private volatile String refreshToken;
     private int expiresIn;
     private LocalDateTime updateTime;
+
+    public PixivClient(String refreshToken) {
+        this.refreshToken = refreshToken;
+        this.refreshToken();
+        this.startTask();
+    }
+
     public String generateCodeVerifier() {
         SecureRandom secureRandom = new SecureRandom();
         byte[] codeVerifier = new byte[32];
@@ -94,26 +104,60 @@ public class PixivClient {
         updateTime = LocalDateTime.now();
         printLoginInfo();
     }
-    public Illust getIllustIdDetail(int illustId){
+
+    public void refreshToken() {
+        Request request = PixivRequestFactory.getPixivRequest()
+                .url("https://oauth.secure.pixiv.net/auth/token")
+                .postForm(new HashMap<String, String>() {
+                    {
+                        put("client_id", "MOBrBDS8blbauoSck0ZfDbtuzpyT");
+                        put("client_secret", "lsACyCD94FhDUtGTXi3QzcFE2uU1hqtDaKeqrdwj");
+                        put("grant_type", "refresh_token");
+                        put("refresh_token", refreshToken);
+                    }
+                })
+                .header("User-Agent", "PixivAndroidApp/5.0.234 (Android 11; Pixel 5)")
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .buildRequest();
+        String result = Call.doCallGetString(request);
+        ONode node = ONode.loadStr(result);
+        accessToken = node.get("access_token").getRawString();
+        refreshToken = node.get("refresh_token").getRawString();
+        expiresIn = node.get("expires_in").getInt();
+        updateTime = LocalDateTime.now();
+        printLoginInfo();
+    }
+
+    public Illust getIllustIdDetail(int illustId) {
         //https://app-api.pixiv.net/v1/illust/detail?illust_id=10000000
         //
         Request request = PixivRequestFactory.getPixivRequest()
                 .url("https://app-api.pixiv.net/v1/illust/detail")
-                .addParam("illust_id",illustId)
-                .header("Authorization", "Bearer "+accessToken)
+                .addParam("illust_id", illustId)
+                .header("Authorization", "Bearer " + accessToken)
                 .buildRequest();
         String result = Call.doCallGetString(request);
         ONode node = ONode.loadStr(result);
-        Illust illust = node.get("illust").toObject(Illust.class);
-        LocalDateTime create_date = TimeUtils.toBeijingTime(node.get("illust").get("create_date").getRawString(), 9);
-        illust.setCreateDate(create_date);
-        return illust;
+        log.info("json:{}", node.toJson());
+        if (!node.get("illust").isNull()) {
+            Illust illust = node.get("illust").toObject(Illust.class);
+            LocalDateTime createDate = TimeUtils.toBeijingTime(node.get("illust").get("create_date").getRawString(), 9);
+            illust.setCreateDate(createDate);
+            illust.setRaw(node.toJson());
+            return illust;
+        } else {
+            //{"error":{"user_message":"","message":"Rate Limit","reason":"","user_message_details":{}}}
+            
+            return null;
+        }
+
     }
-    public void printLoginInfo(){
+
+    public void printLoginInfo() {
         log.info("==================");
         log.info("Pixiv登录信息：");
-        log.info("accessToken：{}",accessToken);
-        log.info("refreshToken：{}",refreshToken);
+        log.info("accessToken：{}", accessToken);
+        log.info("refreshToken：{}", refreshToken);
         log.info("更新时间：{}", TimeUtils.toDateTime(updateTime));
         Duration between = Duration.between(LocalDateTime.now(), updateTime);
         long seconds = between.toSeconds();
@@ -123,8 +167,16 @@ public class PixivClient {
         } else {
             log.info("Token可能已过期");
         }
-
     }
+
+    public void startTask() {
+        ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
+        service.scheduleWithFixedDelay(() -> {
+            log.info("自动刷新Token");
+            refreshToken();
+        }, 30, 30, TimeUnit.MINUTES);
+    }
+
     @Data
     @AllArgsConstructor
     public static class PixivLoginItem {

@@ -1,5 +1,6 @@
 package nya.nekoneko.pixiv.model;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,12 +21,17 @@ public class Illust {
     private Integer id;
     private String title;
     private String type;
+    @TableField(exist = false)
     @ONodeAttr(name = "image_urls")
     private ImageUrl imageUrls;
     private String caption;
+    @TableField(value = "`restrict`")
     private Integer restrict;
+    @TableField(exist = false)
     private User user;
+    @TableField(exist = false)
     private List<Tags> tags;
+    @TableField(exist = false)
     private List<String> tools;
     @ONodeAttr(name = "create_date")
     private LocalDateTime createDate;
@@ -37,9 +43,12 @@ public class Illust {
     private Integer sanityLevel;
     @ONodeAttr(name = "x_restrict")
     private Integer xRestrict;
+    @TableField(exist = false)
     private Series series;
+    @TableField(exist = false)
     @ONodeAttr(name = "meta_single_page")
     private MetaSinglePage metaSinglePage;
+    @TableField(exist = false)
     @ONodeAttr(name = "meta_pages")
     private List<MetaPage> metaPages;
     @ONodeAttr(name = "total_view")
