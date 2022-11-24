@@ -31,7 +31,7 @@ public class Illust {
     @TableField(exist = false)
     private User user;
     @TableField(exist = false)
-    private List<Tags> tags;
+    private List<Tag> tags;
     @TableField(exist = false)
     private List<String> tools;
     @ONodeAttr(name = "create_date")

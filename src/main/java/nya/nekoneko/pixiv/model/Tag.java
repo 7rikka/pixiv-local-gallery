@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 import org.noear.snack.annotation.ONodeAttr;
 
 /**
- * 用户信息
+ * 标签信息
  *
  * @author Ho
  */
@@ -19,27 +19,22 @@ import org.noear.snack.annotation.ONodeAttr;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName("user")
-public class User {
+@TableName("tag")
+public class Tag {
     /**
-     * 用户id
+     *
      */
-    @TableId(value = "id", type = IdType.INPUT)
+    @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
     /**
-     * 用户名称
+     *
      */
     @TableField(value = "name")
     private String name;
     /**
-     * 账号名
+     *
      */
-    @TableField(value = "account")
-    private String account;
-    /**
-     * 头像信息
-     */
-    @TableField(exist = false)
-    @ONodeAttr(name = "profile_image_urls")
-    private ProfileImageUrl profileImageUrls;
+    @TableField(value = "translated_name")
+    @ONodeAttr(name = "translated_name")
+    private String translatedName;
 }
