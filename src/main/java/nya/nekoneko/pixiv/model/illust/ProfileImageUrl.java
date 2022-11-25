@@ -1,4 +1,4 @@
-package nya.nekoneko.pixiv.model;
+package nya.nekoneko.pixiv.model.illust;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Series {
-    private Integer id;
-    private String title;
+public class ProfileImageUrl {
+    private String medium;
 }

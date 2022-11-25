@@ -1,4 +1,4 @@
-package nya.nekoneko.pixiv.model;
+package nya.nekoneko.pixiv.model.illust;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -8,33 +8,29 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.noear.snack.annotation.ONodeAttr;
 
-/**
- * 标签信息
+/***
  *
- * @author Ho
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName("tag")
-public class Tag {
+@TableName("tool")
+public class Tool {
     /**
-     *
+     * 记录id 自增
      */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
     /**
      *
      */
-    @TableField(value = "name")
-    private String name;
+    @TableField(value = "illust_id")
+    private Integer illustId;
     /**
      *
      */
-    @TableField(value = "translated_name")
-    @ONodeAttr(name = "translated_name")
-    private String translatedName;
+    @TableField(value = "name")
+    private String name;
 }

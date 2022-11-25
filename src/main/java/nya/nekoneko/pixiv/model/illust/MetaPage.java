@@ -1,4 +1,4 @@
-package nya.nekoneko.pixiv.model;
+package nya.nekoneko.pixiv.model.illust;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,4 +1,4 @@
-package nya.nekoneko.pixiv.model;
+package nya.nekoneko.pixiv.model.illust;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;

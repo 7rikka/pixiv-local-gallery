@@ -1,4 +1,4 @@
-package nya.nekoneko.pixiv.model;
+package nya.nekoneko.pixiv.model.illust;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MetaSinglePage {
-    private String originalImageUrl;
+public class Series {
+    private Integer id;
+    private String title;
 }
