@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nya.nekoneko.pixiv.model.Illust;
+import nya.nekoneko.pixiv.model.illust.Illust;
 import nya.nekoneko.pixiv.util.Call;
 import nya.nekoneko.pixiv.util.PixivRequestFactory;
 import nya.nekoneko.pixiv.util.TimeUtils;
@@ -155,6 +155,21 @@ public class PixivClient {
                     .build();
         }
 
+    }
+
+    /**
+     * 获取标签详情
+     * @param tagName
+     */
+    public void getTagInfo(String tagName){
+        //https://www.pixiv.net/ajax/search/tags/%E3%83%AA%E3%82%B3%E3%83%AA%E3%82%B9%E3%83%BB%E3%83%AA%E3%82%B3%E3%82%A4%E3%83%AB
+        Request request = PixivRequestFactory.getPixivRequest()
+                .url("https://www.pixiv.net/ajax/search/tags/"+tagName)
+                .header("Cookie", "")
+                .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Edg/107.0.1418.56")
+                .buildRequest();
+        String result = Call.doCallGetString(request);
+        System.out.println(result);
     }
 
     public void printLoginInfo() {
