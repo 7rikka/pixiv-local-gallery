@@ -39,7 +39,7 @@ public class User {
     /**
      * 头像信息
      */
-    @TableField(exist = false)
-    @ONodeAttr(name = "profile_image_urls")
-    private ProfileImageUrl profileImageUrls;
+    @TableField(value = "medium_profile_image_urls")
+    @ONodeAttr(name = "medium_profile_image_urls")
+    private String mediumProfileImageUrls;
 }

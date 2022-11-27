@@ -1,7 +1,9 @@
 package nya.nekoneko.pixiv.model.illust;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,6 +21,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Illust {
+    @TableId(value = "id", type = IdType.INPUT)
     private Integer id;
     private String title;
     private String type;
@@ -28,6 +31,8 @@ public class Illust {
     private String caption;
     @TableField(value = "`restrict`")
     private Integer restrict;
+    @TableField(value = "user_id")
+    private Integer userId;
     @TableField(exist = false)
     private User user;
     @TableField(exist = false)
@@ -69,10 +74,10 @@ public class Illust {
     private Integer illustBookStyle;
     @ONodeAttr(name = "comment_access_control")
     private Integer commentAccessControl;
-    @TableField(value = "create_time",fill = FieldFill.INSERT)
+    @TableField(value = "create_time", fill = FieldFill.INSERT)
     @ONodeAttr(name = "create_time")
     private LocalDateTime createTime;
-    @TableField(value = "update_time",fill = FieldFill.INSERT_UPDATE)
+    @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
     @ONodeAttr(name = "update_time")
     private LocalDateTime updateTime;
     private int state;

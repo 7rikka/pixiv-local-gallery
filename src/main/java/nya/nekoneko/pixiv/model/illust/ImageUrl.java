@@ -20,10 +20,15 @@ import org.noear.snack.annotation.ONodeAttr;
 @TableName("image_url")
 public class ImageUrl {
     /**
-     * 插画id
+     * 记录id 自增
      */
-    @TableId(value = "id",type = IdType.INPUT)
+    @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
+    /**
+     *
+     */
+    @TableField(value = "illust_id")
+    private Integer illustId;
     /**
      *
      */

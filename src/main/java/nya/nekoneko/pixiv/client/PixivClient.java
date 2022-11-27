@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nya.nekoneko.pixiv.model.illust.Illust;
+import nya.nekoneko.pixiv.model.illust.User;
+import nya.nekoneko.pixiv.model.tag.TagInfo;
 import nya.nekoneko.pixiv.util.Call;
 import nya.nekoneko.pixiv.util.PixivRequestFactory;
 import nya.nekoneko.pixiv.util.TimeUtils;
@@ -128,7 +130,7 @@ public class PixivClient {
         printLoginInfo();
     }
 
-    public Illust getIllustIdDetail(int illustId) {
+    public Illust getIllustDetail(int illustId) {
         //https://app-api.pixiv.net/v1/illust/detail?illust_id=10000000
         //
         Request request = PixivRequestFactory.getPixivRequest()
@@ -145,6 +147,11 @@ public class PixivClient {
             illust.setCreateDate(createDate);
             illust.setRaw(node.toJson());
             illust.setState(0);
+            //处理用户
+            User user = illust.getUser();
+            user.setMediumProfileImageUrls(node.get("illust").get("user").get("profile_image_urls").get("medium").getRawString());
+            illust.setUserId(user.getId());
+            log.info("user:"+user);
             return illust;
         } else {
             //{"error":{"user_message":"","message":"Rate Limit","reason":"","user_message_details":{}}}
@@ -170,6 +177,9 @@ public class PixivClient {
                 .buildRequest();
         String result = Call.doCallGetString(request);
         System.out.println(result);
+        TagInfo t = ONode.loadStr(result).toObject(TagInfo.class);
+        System.out.println(t.getError());
+        System.out.println(t.getBody());
     }
 
     public void printLoginInfo() {
