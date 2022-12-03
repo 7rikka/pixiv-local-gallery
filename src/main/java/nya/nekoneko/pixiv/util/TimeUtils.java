@@ -81,4 +81,10 @@ public class TimeUtils {
         ZonedDateTime converted = zonedtime.withZoneSameInstant(ZoneOffset.ofHours(8));
         return converted.toLocalDateTime();
     }
+    public static LocalDateTime toBeijingTime(LocalDateTime time, int offset) {
+        System.out.println(time);
+        ZonedDateTime zonedtime = time.atZone(ZoneId.from(ZoneOffset.ofHours(offset)));
+        ZonedDateTime converted = zonedtime.withZoneSameInstant(ZoneOffset.ofHours(8));
+        return converted.toLocalDateTime();
+    }
 }

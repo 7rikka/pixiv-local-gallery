@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
-@Component
+//@Component
 public class MainTask implements IJob {
     @Inject
     private PixivClient client;

@@ -41,6 +41,8 @@ public class Illust {
     private List<String> tools;
     @ONodeAttr(name = "create_date")
     private LocalDateTime createDate;
+    @ONodeAttr(name = "upload_date")
+    private LocalDateTime uploadDate;
     @ONodeAttr(name = "page_count")
     private Integer pageCount;
     private Integer width;
