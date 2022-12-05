@@ -32,9 +32,7 @@ public class PixivRequest {
     public PixivRequest url(String url, Map<String, String> params) {
         this.url = url;
         if (null != params) {
-            for (Map.Entry<String, String> param : params.entrySet()) {
-                this.paramMap.put(param.getKey(), param.getValue());
-            }
+            this.paramMap.putAll(params);
         }
         return this;
     }

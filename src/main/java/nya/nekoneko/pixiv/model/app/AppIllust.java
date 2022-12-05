@@ -9,6 +9,9 @@ import org.noear.snack.annotation.ONodeAttr;
 
 import java.util.List;
 
+/**
+ * @author takan
+ */
 @Data
 @Builder
 @NoArgsConstructor
@@ -33,7 +36,7 @@ public class AppIllust {
      *
      */
     @ONodeAttr(name = "image_urls")
-    private ImageUrl image_urls;
+    private ImageUrl imageUrls;
     /**
      *
      */
@@ -63,12 +66,12 @@ public class AppIllust {
      *
      */
     @ONodeAttr(name = "create_date")
-    private String create_date;
+    private String createDate;
     /**
      *
      */
     @ONodeAttr(name = "page_count")
-    private Integer page_count;
+    private Integer pageCount;
     /**
      *
      */
@@ -83,12 +86,12 @@ public class AppIllust {
      *
      */
     @ONodeAttr(name = "sanity_level")
-    private Integer sanity_level;
+    private Integer sanityLevel;
     /**
      *
      */
     @ONodeAttr(name = "x_restrict")
-    private Integer x_restrict;
+    private Integer xRestrict;
     /**
      *
      */
@@ -98,27 +101,27 @@ public class AppIllust {
      *
      */
     @ONodeAttr(name = "meta_single_page")
-    private AppMetaSinglePage meta_single_page;
+    private AppMetaSinglePage metaSinglePage;
     /**
      *
      */
     @ONodeAttr(name = "meta_pages")
-    private List<String> meta_pages;
+    private List<String> metaPages;
     /**
      *
      */
     @ONodeAttr(name = "total_view")
-    private Integer total_view;
+    private Integer totalView;
     /**
      *
      */
     @ONodeAttr(name = "total_bookmarks")
-    private Integer total_bookmarks;
+    private Integer totalBookmarks;
     /**
      *
      */
     @ONodeAttr(name = "is_bookmarked")
-    private Boolean is_bookmarked;
+    private Boolean isBookmarked;
     /**
      *
      */
@@ -128,25 +131,25 @@ public class AppIllust {
      *
      */
     @ONodeAttr(name = "is_muted")
-    private Boolean is_muted;
+    private Boolean isMuted;
     /**
      *
      */
     @ONodeAttr(name = "total_comments")
-    private Integer total_comments;
+    private Integer totalComments;
     /**
      *
      */
     @ONodeAttr(name = "illust_ai_type")
-    private Integer illust_ai_type;
+    private Integer illustAiType;
     /**
      *
      */
     @ONodeAttr(name = "illust_book_style")
-    private Integer illust_book_style;
+    private Integer illustBookStyle;
     /**
      *
      */
     @ONodeAttr(name = "comment_access_control")
-    private Integer comment_access_control;
+    private Integer commentAccessControl;
 }

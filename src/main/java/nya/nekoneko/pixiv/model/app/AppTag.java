@@ -6,6 +6,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.noear.snack.annotation.ONodeAttr;
 
+/**
+ * @author takan
+ */
 @Data
 @Builder
 @NoArgsConstructor
@@ -20,5 +23,5 @@ public class AppTag {
      *
      */
     @ONodeAttr(name = "translated_name")
-    private String translated_name;
+    private String translatedName;
 }

@@ -6,6 +6,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.noear.snack.annotation.ONodeAttr;
 
+/**
+ * @author takan
+ */
 @Data
 @Builder
 @NoArgsConstructor
@@ -35,5 +38,5 @@ public class AppUser {
      *
      */
     @ONodeAttr(name = "is_followed")
-    private Boolean is_followed;
+    private Boolean isFollowed;
 }

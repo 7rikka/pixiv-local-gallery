@@ -22,19 +22,13 @@ import org.noear.snack.annotation.ONodeAttr;
 @TableName("tag")
 public class Tag {
     /**
-     *
+     * 自增id
      */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
     /**
-     *
+     * 标签名
      */
     @TableField(value = "name")
     private String name;
-    /**
-     *
-     */
-    @TableField(value = "translated_name")
-    @ONodeAttr(name = "translated_name")
-    private String translatedName;
 }

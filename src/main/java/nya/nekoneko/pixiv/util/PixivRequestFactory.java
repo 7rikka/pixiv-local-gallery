@@ -1,5 +1,8 @@
 package nya.nekoneko.pixiv.util;
 
+/**
+ * @author takan
+ */
 public class PixivRequestFactory {
     /**
      * 获取请求

@@ -76,7 +76,7 @@ public class Illust {
     @TableField(exist = false)
     private List<Tag> tags;
     /**
-     * 使用工具
+     * 使用工具列表
      */
     @TableField(exist = false)
     private List<String> tools;
@@ -117,6 +117,9 @@ public class Illust {
      */
     @ONodeAttr(name = "x_restrict")
     private Integer xRestrict;
+    /**
+     * 系列
+     */
     @TableField(exist = false)
     private Series series;
     /**
@@ -179,12 +182,12 @@ public class Illust {
     @ONodeAttr(name = "update_time")
     private LocalDateTime updateTime;
     /**
-     * 状态
+     * 插画总体状态
      * 0：正常
      * -1：无效
      */
     @ONodeAttr(name = "state")
-    private int state;
+    private Integer state;
     /**
      * App Api 返回 Json
      */

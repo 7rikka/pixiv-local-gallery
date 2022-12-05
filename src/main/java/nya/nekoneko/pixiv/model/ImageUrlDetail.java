@@ -26,7 +26,7 @@ public class ImageUrlDetail {
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
     /**
-     *
+     * 插画id
      */
     @TableField(value = "illust_id")
     private Integer illustId;
@@ -65,15 +65,16 @@ public class ImageUrlDetail {
     @TableField(value = "width")
     private Integer width;
     /**
-     * sha1
+     * sha1值
      */
     @TableField(value = "sha1")
     private String sha1;
     /**
      * 状态
-     * 0：创建
-     * 1：已下载
+     * 0：未下载
+     * 1：待下载
      * 2：已下载
+     * 3：已删除
      */
     @TableField(value = "state")
     private Integer state;
