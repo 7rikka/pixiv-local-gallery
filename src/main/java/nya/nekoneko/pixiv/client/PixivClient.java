@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nya.nekoneko.pixiv.model.*;
+import nya.nekoneko.pixiv.model.app.*;
 import nya.nekoneko.pixiv.util.Call;
 import nya.nekoneko.pixiv.util.PixivRequestFactory;
 import nya.nekoneko.pixiv.util.TimeUtils;
@@ -16,20 +18,32 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
- *
+ * @author Ho
  */
 @Slf4j
 @NoArgsConstructor
 @AllArgsConstructor
 public class PixivClient {
-    private String accessToken;
-    private String refreshToken;
+    private volatile String accessToken;
+    private volatile String refreshToken;
     private int expiresIn;
     private LocalDateTime updateTime;
+
+    public PixivClient(String refreshToken) {
+        this.refreshToken = refreshToken;
+        this.refreshToken();
+        this.startTask();
+    }
+
     public String generateCodeVerifier() {
         SecureRandom secureRandom = new SecureRandom();
         byte[] codeVerifier = new byte[32];
@@ -93,11 +107,238 @@ public class PixivClient {
         updateTime = LocalDateTime.now();
         printLoginInfo();
     }
-    public void printLoginInfo(){
+
+    public void refreshToken() {
+        Request request = PixivRequestFactory.getPixivRequest()
+                .url("https://oauth.secure.pixiv.net/auth/token")
+                .postForm(new HashMap<String, String>() {
+                    {
+                        put("client_id", "MOBrBDS8blbauoSck0ZfDbtuzpyT");
+                        put("client_secret", "lsACyCD94FhDUtGTXi3QzcFE2uU1hqtDaKeqrdwj");
+                        put("grant_type", "refresh_token");
+                        put("refresh_token", refreshToken);
+                    }
+                })
+                .header("User-Agent", "PixivAndroidApp/5.0.234 (Android 11; Pixel 5)")
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .buildRequest();
+        String result = Call.doCallGetString(request);
+        ONode node = ONode.loadStr(result);
+        accessToken = node.get("access_token").getRawString();
+        refreshToken = node.get("refresh_token").getRawString();
+        expiresIn = node.get("expires_in").getInt();
+        updateTime = LocalDateTime.now();
+        printLoginInfo();
+    }
+
+    public Illust getIllustDetail(int illustId) {
+        //https://app-api.pixiv.net/v1/illust/detail?illust_id=10000000
+        Request request = PixivRequestFactory.getPixivRequest()
+                .url("https://app-api.pixiv.net/v1/illust/detail")
+                .addParam("illust_id", illustId)
+                .header("Authorization", "Bearer " + accessToken)
+                .buildRequest();
+        String result = Call.doCallGetString(request);
+        ONode node = ONode.loadStr(result);
+        ONode illustNode = node.get("illust");
+        if (!illustNode.isNull()) {
+
+            AppIllust appIllust = illustNode.toObject(AppIllust.class);
+            LocalDateTime createDate = TimeUtils.toBeijingTime(illustNode.get("create_date").getRawString());
+            appIllust.setCreateDate(createDate);
+            //处理成Illust对象
+            System.out.println(appIllust);
+            Illust.IllustBuilder illustBuilder = Illust.builder()
+                    .id(appIllust.getId())
+                    .title(appIllust.getTitle())
+                    .type(convertType(appIllust.getType()))
+                    .description(appIllust.getCaption())
+                    .restrict(appIllust.getRestrict())
+                    .userId(appIllust.getUser().getId())
+                    .tools(appIllust.getTools())
+                    .createDate(appIllust.getCreateDate())
+                    .pageCount(appIllust.getPageCount())
+                    .width(appIllust.getWidth())
+                    .height(appIllust.getHeight())
+                    .sanityLevel(appIllust.getSanityLevel())
+                    .xRestrict(appIllust.getXRestrict())
+                    .viewCount(appIllust.getTotalView())
+                    .bookmarkCount(appIllust.getTotalBookmarks())
+                    .visible(appIllust.getVisible())
+                    .commentCount(appIllust.getTotalComments())
+                    .aiType(appIllust.getIllustAiType())
+                    .illustBookStyle(appIllust.getIllustBookStyle())
+                    .commentOff(appIllust.getCommentAccessControl())
+                    .appRaw(node.toJson());
+            //总体状态
+            if (appIllust.getRestrict() != 0 || !appIllust.getVisible()) {
+                illustBuilder.state(-1);
+            } else {
+                illustBuilder.state(0);
+            }
+            //处理url
+            List<ImageUrl> list = new ArrayList<>();
+            if (1 == appIllust.getPageCount()) {
+                AppImageUrl imageUrls = appIllust.getImageUrls();
+                ImageUrl imageUrl = ImageUrl.builder()
+                        .squareMedium(
+                                ImageUrlDetail.builder()
+                                        .illustId(illustId)
+                                        .index(0)
+                                        .type(4)
+                                        .url(imageUrls.getSquareMedium())
+                                        .state(0)
+                                        .build()
+                        )
+                        .medium(
+                                ImageUrlDetail.builder()
+                                        .illustId(illustId)
+                                        .index(0)
+                                        .type(5)
+                                        .url(imageUrls.getMedium())
+                                        .state(0)
+                                        .build()
+                        )
+                        .large(
+                                ImageUrlDetail.builder()
+                                        .illustId(illustId)
+                                        .index(0)
+                                        .type(6)
+                                        .url(imageUrls.getLarge())
+                                        .state(0)
+                                        .build()
+                        )
+                        .original(ImageUrlDetail.builder()
+                                .illustId(illustId)
+                                .index(0)
+                                .type(7)
+                                .url(appIllust.getMetaSinglePage().getOriginalImageUrl())
+                                .state(0)
+                                .build())
+                        .build();
+                list.add(imageUrl);
+            } else {
+                List<AppMetaPages> metaPages = appIllust.getMetaPages();
+                int index = 0;
+                for (AppMetaPages metaPage : metaPages) {
+                    AppImageUrl imageUrls = metaPage.getImageUrls();
+                    ImageUrl imageUrl = ImageUrl.builder()
+                            .squareMedium(
+                                    ImageUrlDetail.builder()
+                                            .illustId(illustId)
+                                            .index(index)
+                                            .type(4)
+                                            .url(imageUrls.getSquareMedium())
+                                            .state(0)
+                                            .build()
+                            )
+                            .medium(
+                                    ImageUrlDetail.builder()
+                                            .illustId(illustId)
+                                            .index(index)
+                                            .type(5)
+                                            .url(imageUrls.getMedium())
+                                            .state(0)
+                                            .build()
+                            )
+                            .large(
+                                    ImageUrlDetail.builder()
+                                            .illustId(illustId)
+                                            .index(index)
+                                            .type(6)
+                                            .url(imageUrls.getLarge())
+                                            .state(0)
+                                            .build()
+                            )
+                            .original(ImageUrlDetail.builder()
+                                    .illustId(illustId)
+                                    .index(index)
+                                    .type(7)
+                                    .url(appIllust.getMetaSinglePage().getOriginalImageUrl())
+                                    .state(0)
+                                    .build())
+                            .build();
+                    list.add(imageUrl);
+                    index++;
+                }
+            }
+            illustBuilder.urls(list);
+            //处理用户
+            AppUser user = appIllust.getUser();
+            illustBuilder.user(User.builder()
+                    .id(user.getId())
+                    .name(user.getName())
+                    .account(user.getAccount())
+                    .mediumProfileImageUrls(user.getProfileImageUrls().getMedium())
+                    .build());
+            //处理tag
+            List<AppTag> tags = appIllust.getTags();
+            List<Tag> tagList = new ArrayList<>();
+            for (AppTag tag : tags) {
+                tagList.add(Tag.builder()
+                        .name(tag.getName())
+                        .build());
+            }
+            illustBuilder.tags(tagList);
+            //处理系列
+            AppSeries series = appIllust.getSeries();
+            if (null != series) {
+                illustBuilder.series(Series.builder()
+                        .id(series.getId())
+                        .title(series.getTitle())
+                        .build());
+
+            }
+            return illustBuilder.build();
+        } else {
+            //{"error":{"user_message":"","message":"Rate Limit","reason":"","user_message_details":{}}}
+            return Illust.builder()
+                    .id(illustId)
+                    .state(-1)
+                    .appRaw(node.toJson())
+                    .build();
+        }
+
+    }
+
+    private Integer convertType(String type) {
+//        if ()
+        if ("illust".equals(type)) {
+            return 0;
+        }
+        if ("manga".equals(type)) {
+            return 1;
+        }
+        if ("ugoira".equals(type)) {
+            return 2;
+        }
+        return -1;
+    }
+
+//    /**
+//     * 获取标签详情
+//     *
+//     * @param tagName
+//     */
+//    public void getTagInfo(String tagName) {
+//        //https://www.pixiv.net/ajax/search/tags/%E3%83%AA%E3%82%B3%E3%83%AA%E3%82%B9%E3%83%BB%E3%83%AA%E3%82%B3%E3%82%A4%E3%83%AB
+//        Request request = PixivRequestFactory.getPixivRequest()
+//                .url("https://www.pixiv.net/ajax/search/tags/" + tagName)
+//                .header("Cookie", "")
+//                .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Edg/107.0.1418.56")
+//                .buildRequest();
+//        String result = Call.doCallGetString(request);
+//        System.out.println(result);
+//        TagInfo t = ONode.loadStr(result).toObject(TagInfo.class);
+//        System.out.println(t.getError());
+//        System.out.println(t.getBody());
+//    }
+
+    public void printLoginInfo() {
         log.info("==================");
         log.info("Pixiv登录信息：");
-        log.info("accessToken：{}",accessToken);
-        log.info("refreshToken：{}",refreshToken);
+        log.info("accessToken：{}", accessToken);
+        log.info("refreshToken：{}", refreshToken);
         log.info("更新时间：{}", TimeUtils.toDateTime(updateTime));
         Duration between = Duration.between(LocalDateTime.now(), updateTime);
         long seconds = between.toSeconds();
@@ -107,8 +348,16 @@ public class PixivClient {
         } else {
             log.info("Token可能已过期");
         }
-
     }
+
+    public void startTask() {
+        ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
+        service.scheduleWithFixedDelay(() -> {
+            log.info("自动刷新Token");
+            refreshToken();
+        }, 30, 30, TimeUnit.MINUTES);
+    }
+
     @Data
     @AllArgsConstructor
     public static class PixivLoginItem {

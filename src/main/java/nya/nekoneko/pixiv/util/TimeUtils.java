@@ -1,13 +1,8 @@
 package nya.nekoneko.pixiv.util;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 
-/**
- * @author takan
- */
 public class TimeUtils {
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss");
@@ -77,5 +72,15 @@ public class TimeUtils {
             return null;
         }
         return localDateTime.format(TIME_FORMAT);
+    }
+
+    public static LocalDateTime toBeijingTime(String time) {
+        String[] split = time.split("\\+");
+        time = split[0].replace("T", " ");
+        int offset = Integer.parseInt(split[1].split(":")[0]);
+        LocalDateTime localDateTime = LocalDateTime.parse(time, DATETIME_FORMAT);
+        ZonedDateTime zonedtime = localDateTime.atZone(ZoneId.from(ZoneOffset.ofHours(offset)));
+        ZonedDateTime converted = zonedtime.withZoneSameInstant(ZoneOffset.ofHours(8));
+        return converted.toLocalDateTime();
     }
 }

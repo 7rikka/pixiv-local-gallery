@@ -34,12 +34,12 @@ public class Illust {
     private String title;
     /**
      * 类型
-     * illust
-     * manga
-     * ugoira
+     * 0：illust
+     * 1：manga
+     * 2：ugoira
      */
     @ONodeAttr(name = "type")
-    private String type;
+    private Integer type;
     /**
      * 插画介绍
      */
@@ -50,7 +50,7 @@ public class Illust {
      */
     @TableField(exist = false)
     @ONodeAttr(name = "urls")
-    private ImageUrl urls;
+    private List<ImageUrl> urls;
     /**
      * 浏览限制
      * 0：正常
@@ -145,7 +145,7 @@ public class Illust {
     @ONodeAttr(name = "comment_count")
     private Integer commentCount;
     /**
-     * 总评论数
+     * 总点赞数
      */
     @ONodeAttr(name = "like_count")
     private Integer likeCount;

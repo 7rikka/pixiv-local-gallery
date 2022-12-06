@@ -4,9 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import nya.nekoneko.pixiv.model.ImageUrl;
 import org.noear.snack.annotation.ONodeAttr;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -36,7 +36,7 @@ public class AppIllust {
      *
      */
     @ONodeAttr(name = "image_urls")
-    private ImageUrl imageUrls;
+    private AppImageUrl imageUrls;
     /**
      *
      */
@@ -66,7 +66,7 @@ public class AppIllust {
      *
      */
     @ONodeAttr(name = "create_date")
-    private String createDate;
+    private LocalDateTime createDate;
     /**
      *
      */
@@ -96,7 +96,7 @@ public class AppIllust {
      *
      */
     @ONodeAttr(name = "series")
-    private String series;
+    private AppSeries series;
     /**
      *
      */
@@ -106,7 +106,7 @@ public class AppIllust {
      *
      */
     @ONodeAttr(name = "meta_pages")
-    private List<String> metaPages;
+    private List<AppMetaPages> metaPages;
     /**
      *
      */

@@ -49,6 +49,11 @@ public class ImageUrlDetail {
     @TableField(value = "type")
     private Integer type;
     /**
+     * 图片地址
+     */
+    @TableField(value = "url")
+    private String url;
+    /**
      * 图片大小
      * 单位：字节
      */
