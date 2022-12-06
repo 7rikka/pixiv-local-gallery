@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import org.noear.snack.annotation.ONodeAttr;
 
 /**
- * @author takan
+ * @author Ho
  */
 @Data
 @Builder

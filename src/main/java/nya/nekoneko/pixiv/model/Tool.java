@@ -8,9 +8,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
- 
-/**
- * 标签信息
+
+/***
  *
  * @author Ho
  */
@@ -18,15 +17,20 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName("tag")
-public class Tag {
+@TableName("tool")
+public class Tool {
     /**
-     * 自增id
+     * 记录id 自增
      */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
     /**
-     * 标签名
+     *
+     */
+    @TableField(value = "illust_id")
+    private Integer illustId;
+    /**
+     *
      */
     @TableField(value = "name")
     private String name;

@@ -8,9 +8,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
- 
+
 /**
- * 标签信息
+ * 插画-标签 关系记录
  *
  * @author Ho
  */
@@ -18,16 +18,21 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName("tag")
-public class Tag {
+@TableName("tag_relation")
+public class TagRelation {
     /**
-     * 自增id
+     * 记录id 自增
      */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
     /**
-     * 标签名
+     * 插画id
      */
-    @TableField(value = "name")
-    private String name;
+    @TableField(value = "illust_id")
+    private Integer illustId;
+    /**
+     * 标签id
+     */
+    @TableField(value = "tag_id")
+    private Integer tagId;
 }
