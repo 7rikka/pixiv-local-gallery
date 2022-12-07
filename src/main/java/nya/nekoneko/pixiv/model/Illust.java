@@ -60,6 +60,14 @@ public class Illust {
     @TableField(value = "`restrict`")
     private Integer restrict;
     /**
+     * 浏览限制
+     * 0：全年龄
+     * 1：R-18
+     * 2：R-18G
+     */
+    @ONodeAttr(name = "x_restrict")
+    private Integer xRestrict;
+    /**
      * 作者id
      */
     @ONodeAttr(ignore = true)
@@ -109,14 +117,6 @@ public class Illust {
      */
     @ONodeAttr(name = "sanity_level")
     private Integer sanityLevel;
-    /**
-     * 浏览限制
-     * 0：全年龄
-     * 1：R-18
-     * 2：R-18G
-     */
-    @ONodeAttr(name = "x_restrict")
-    private Integer xRestrict;
     /**
      * 系列
      */
