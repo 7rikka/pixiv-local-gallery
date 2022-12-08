@@ -4,12 +4,12 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import nya.nekoneko.pixiv.mapper.ImageUrlDetailMapper;
 import nya.nekoneko.pixiv.model.ImageUrlDetail;
 import org.apache.ibatis.solon.annotation.Db;
-import org.noear.solon.aspect.annotation.Service;
+import org.noear.solon.annotation.Component;
 
 /**
  * @author Ho
  */
-@Service
+@Component
 public class ImageUrlDetailService {
     @Db
     private ImageUrlDetailMapper imageUrlDetailMapper;

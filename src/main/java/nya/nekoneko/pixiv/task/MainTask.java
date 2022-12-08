@@ -56,7 +56,7 @@ public class MainTask implements IJob {
             tagMap.put(tag.getName(), tag);
         }
         log.info("获取到Tag信息共 {} 条", tagMap.size());
-        for (int i = 99941831; i >= 0; i--) {
+        for (int i = 100000000; i >= 99999000; i--) {
             try {
                 log.info("获取插画信息, id: {}", i);
                 Illust illustDetail = client.getIllustDetail(i);
@@ -71,10 +71,7 @@ public class MainTask implements IJob {
                         illustService.save(illustDetail);
                     } else {
                         //更新保存
-                        Illust build = Illust.builder()
-                                .id(i)
-                                .state(-2)
-                                .build();
+                        Illust build = Illust.builder().id(i).state(-2).build();
                         illustMapper.updateById(build);
                     }
                 }
@@ -83,10 +80,7 @@ public class MainTask implements IJob {
                     //处理tool
                     List<String> tools = illustDetail.getTools();
                     for (String tool : tools) {
-                        toolService.save(Tool.builder()
-                                .illustId(i)
-                                .name(tool)
-                                .build());
+                        toolService.save(Tool.builder().illustId(i).name(tool).build());
                     }
                     //图片信息
                     List<ImageUrl> urls = illustDetail.getUrls();
@@ -111,10 +105,7 @@ public class MainTask implements IJob {
                             tagMap.put(tag1.getName(), tag1);
                         }
                         //保存Tag关联
-                        tagRelationService.save(TagRelation.builder()
-                                .illustId(i)
-                                .tagId(tagMap.get(tag.getName()).getId())
-                                .build());
+                        tagRelationService.save(TagRelation.builder().illustId(i).tagId(tagMap.get(tag.getName()).getId()).build());
                     }
                     //用户
                     userService.save(illustDetail.getUser());

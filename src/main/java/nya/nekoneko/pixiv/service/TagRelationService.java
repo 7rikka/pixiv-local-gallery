@@ -4,12 +4,12 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import nya.nekoneko.pixiv.mapper.TagRelationMapper;
 import nya.nekoneko.pixiv.model.TagRelation;
 import org.apache.ibatis.solon.annotation.Db;
-import org.noear.solon.aspect.annotation.Service;
+import org.noear.solon.annotation.Component;
 
 /**
  * @author Ho
  */
-@Service
+@Component
 public class TagRelationService {
     @Db
     private TagRelationMapper tagRelationMapper;
