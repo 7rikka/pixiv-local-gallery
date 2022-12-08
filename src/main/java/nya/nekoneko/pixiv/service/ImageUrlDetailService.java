@@ -18,6 +18,9 @@ public class ImageUrlDetailService {
      * @param imageUrlDetail
      */
     public void save(ImageUrlDetail imageUrlDetail) {
+        if (null == imageUrlDetail) {
+            return;
+        }
         LambdaQueryWrapper<ImageUrlDetail> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(ImageUrlDetail::getIllustId, imageUrlDetail.getIllustId());
         wrapper.eq(ImageUrlDetail::getIndex, imageUrlDetail.getIndex());

@@ -283,11 +283,12 @@ public class PixivClient {
             //处理系列
             AppSeries series = appIllust.getSeries();
             if (null != series) {
-                illustBuilder.series(Series.builder()
-                        .id(series.getId())
-                        .title(series.getTitle())
-                        .build());
-
+                illustBuilder
+                        .seriesId(series.getId())
+                        .series(Series.builder()
+                                .id(series.getId())
+                                .title(series.getTitle())
+                                .build());
             }
             return illustBuilder.build();
         } else {

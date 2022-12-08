@@ -118,6 +118,11 @@ public class Illust {
     @ONodeAttr(name = "sanity_level")
     private Integer sanityLevel;
     /**
+     * 系列id
+     */
+    @ONodeAttr(name = "series_id")
+    private Integer seriesId;
+    /**
      * 系列
      */
     @TableField(exist = false)

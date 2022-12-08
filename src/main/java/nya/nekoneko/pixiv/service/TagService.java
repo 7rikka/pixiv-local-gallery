@@ -23,4 +23,10 @@ public class TagService {
             tagMapper.updateById(tag);
         }
     }
+
+    public Tag get(String name) {
+        LambdaQueryWrapper<Tag> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Tag::getName, name);
+        return tagMapper.selectOne(wrapper);
+    }
 }

@@ -18,6 +18,9 @@ public class SeriesService {
      * @param series
      */
     public void save(Series series) {
+        if (null == series) {
+            return;
+        }
         LambdaQueryWrapper<Series> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Series::getId, series.getId());
         if (!seriesMapper.exists(wrapper)) {
