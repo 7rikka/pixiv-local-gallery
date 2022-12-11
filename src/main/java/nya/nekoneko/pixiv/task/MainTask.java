@@ -70,9 +70,16 @@ public class MainTask implements IJob {
                         //新增保存
                         illustService.save(illustDetail);
                     } else {
-                        //更新保存
-                        Illust build = Illust.builder().id(i).state(-2).build();
-                        illustMapper.updateById(build);
+                        if (illust.getState() == 0) {
+                            //原来是正常的
+                            //更新保存
+                            Illust build = Illust.builder().id(i).state(-2).build();
+                            illustMapper.updateById(build);
+                        } else {
+                            //原来是非正常
+                            Illust build = Illust.builder().id(i).build();
+                            illustMapper.updateById(build);
+                        }
                     }
                 }
                 //处理其他信息
@@ -105,7 +112,12 @@ public class MainTask implements IJob {
                             tagMap.put(tag1.getName(), tag1);
                         }
                         //保存Tag关联
-                        tagRelationService.save(TagRelation.builder().illustId(i).tagId(tagMap.get(tag.getName()).getId()).build());
+                        Tag tag1 = tagMap.get(tag.getName());
+                        if (null == tag1) {
+                            log.info("手动获取Tag: {}", tag.getName());
+                            tag1 = tagService.get(tag.getName());
+                        }
+                        tagRelationService.save(TagRelation.builder().illustId(i).tagId(tag1.getId()).build());
                     }
                     //用户
                     userService.save(illustDetail.getUser());

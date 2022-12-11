@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import nya.nekoneko.pixiv.model.ImageUrlDetail;
 import org.noear.snack.annotation.ONodeAttr;
 
 /**
@@ -30,4 +29,9 @@ public class AppImageUrl {
      */
     @ONodeAttr(name = "large")
     private String large;
+    /**
+     *
+     */
+    @ONodeAttr(name = "original")
+    private String original;
 }
