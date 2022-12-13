@@ -17,23 +17,8 @@ public class ImageUrl {
     /**
      *
      */
-    @ONodeAttr(name = "mini")
-    private ImageUrlDetail mini;
-    /**
-     *
-     */
-    @ONodeAttr(name = "thumb")
-    private ImageUrlDetail thumb;
-    /**
-     *
-     */
-    @ONodeAttr(name = "small")
-    private ImageUrlDetail small;
-    /**
-     *
-     */
-    @ONodeAttr(name = "regular")
-    private ImageUrlDetail regular;
+    @ONodeAttr(name = "thumb_mini")
+    private ImageUrlDetail thumbMini;
     /**
      *
      */
@@ -49,6 +34,11 @@ public class ImageUrl {
      */
     @ONodeAttr(name = "large")
     private ImageUrlDetail large;
+    /**
+     *
+     */
+    @ONodeAttr(name = "regular")
+    private ImageUrlDetail regular;
     /**
      *
      */

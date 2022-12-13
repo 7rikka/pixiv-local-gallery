@@ -6,6 +6,10 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nya.nekoneko.pixiv.model.*;
 import nya.nekoneko.pixiv.model.app.*;
+import nya.nekoneko.pixiv.model.web.WebAjaxUrl;
+import nya.nekoneko.pixiv.model.web.WebBody;
+import nya.nekoneko.pixiv.model.web.WebSeriesNavData;
+import nya.nekoneko.pixiv.model.web.WebTag;
 import nya.nekoneko.pixiv.util.Call;
 import nya.nekoneko.pixiv.util.PixivRequestFactory;
 import nya.nekoneko.pixiv.util.TimeUtils;
@@ -147,7 +151,6 @@ public class PixivClient {
             LocalDateTime createDate = TimeUtils.toBeijingTime(illustNode.get("create_date").getRawString());
             appIllust.setCreateDate(createDate);
             //处理成Illust对象
-            System.out.println(appIllust);
             Illust.IllustBuilder illustBuilder = Illust.builder()
                     .id(appIllust.getId())
                     .title(appIllust.getTitle())
@@ -185,7 +188,7 @@ public class PixivClient {
                                 ImageUrlDetail.builder()
                                         .illustId(illustId)
                                         .index(0)
-                                        .type(4)
+                                        .type(1)
                                         .url(imageUrls.getSquareMedium())
                                         .state(0)
                                         .build()
@@ -194,7 +197,7 @@ public class PixivClient {
                                 ImageUrlDetail.builder()
                                         .illustId(illustId)
                                         .index(0)
-                                        .type(5)
+                                        .type(2)
                                         .url(imageUrls.getMedium())
                                         .state(0)
                                         .build()
@@ -203,7 +206,7 @@ public class PixivClient {
                                 ImageUrlDetail.builder()
                                         .illustId(illustId)
                                         .index(0)
-                                        .type(6)
+                                        .type(3)
                                         .url(imageUrls.getLarge())
                                         .state(0)
                                         .build()
@@ -211,7 +214,7 @@ public class PixivClient {
                         .original(ImageUrlDetail.builder()
                                 .illustId(illustId)
                                 .index(0)
-                                .type(7)
+                                .type(5)
                                 .url(appIllust.getMetaSinglePage().getOriginalImageUrl())
                                 .state(0)
                                 .build())
@@ -227,7 +230,7 @@ public class PixivClient {
                                     ImageUrlDetail.builder()
                                             .illustId(illustId)
                                             .index(index)
-                                            .type(4)
+                                            .type(1)
                                             .url(imageUrls.getSquareMedium())
                                             .state(0)
                                             .build()
@@ -236,7 +239,7 @@ public class PixivClient {
                                     ImageUrlDetail.builder()
                                             .illustId(illustId)
                                             .index(index)
-                                            .type(5)
+                                            .type(2)
                                             .url(imageUrls.getMedium())
                                             .state(0)
                                             .build()
@@ -245,7 +248,7 @@ public class PixivClient {
                                     ImageUrlDetail.builder()
                                             .illustId(illustId)
                                             .index(index)
-                                            .type(6)
+                                            .type(3)
                                             .url(imageUrls.getLarge())
                                             .state(0)
                                             .build()
@@ -253,8 +256,8 @@ public class PixivClient {
                             .original(ImageUrlDetail.builder()
                                     .illustId(illustId)
                                     .index(index)
-                                    .type(7)
-                                    .url(appIllust.getMetaSinglePage().getOriginalImageUrl())
+                                    .type(5)
+                                    .url(imageUrls.getOriginal())
                                     .state(0)
                                     .build())
                             .build();
@@ -302,6 +305,143 @@ public class PixivClient {
 
     }
 
+    public Illust getIllustDetailWeb(int illustId) {
+        Request request = PixivRequestFactory.getPixivRequest()
+                .url("https://www.pixiv.net/ajax/illust/" + illustId)
+                .get()
+                .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Edg/107.0.1418.56")
+                .buildRequest();
+
+        String result = Call.doCallGetString(request);
+        ONode node = ONode.loadStr(result);
+        if (!node.get("error").getRawBoolean()) {
+            ONode bodyNode = node.get("body");
+
+            WebBody body = bodyNode.toObject(WebBody.class);
+            String createDate = bodyNode.get("createDate").getRawString();
+            String uploadDate = bodyNode.get("uploadDate").getRawString();
+            Illust.IllustBuilder builder = Illust.builder()
+                    .id(body.getId())
+                    .title(body.getTitle())
+                    .type(body.getIllustType())
+                    .description(body.getDescription())
+                    .restrict(body.getRestrict())
+                    .xRestrict(body.getXRestrict())
+                    .userId(body.getUserId())
+                    .createDate(TimeUtils.toBeijingTime(createDate))
+                    .uploadDate(TimeUtils.toBeijingTime(uploadDate))
+                    .pageCount(body.getPageCount())
+                    .width(body.getWidth())
+                    .height(body.getHeight())
+                    .sanityLevel(body.getSl())
+                    .viewCount(body.getViewCount())
+                    .bookmarkCount(body.getBookmarkCount())
+                    .commentCount(body.getCommentCount())
+                    .likeCount(body.getLikeCount())
+                    .aiType(body.getAiType())
+                    .illustBookStyle(body.getIllustType())
+                    .commentOff(body.getCommentOff())
+                    .webRaw(node.toJson());
+            //处理用户
+            builder.user(User.builder()
+                    .id(body.getUserId())
+                    .name(body.getUserName())
+                    .account(body.getUserAccount())
+                    .build());
+            //标签
+            List<Tag> tagList = new ArrayList<>();
+            List<WebTag> tags = body.getTags().getTags();
+            for (WebTag tag : tags) {
+                tagList.add(Tag.builder()
+                        .name(tag.getTag())
+                        .build());
+            }
+            builder.tags(tagList);
+            //系列
+            WebSeriesNavData seriesNavData = body.getSeriesNavData();
+            if (null != seriesNavData) {
+                builder
+                        .seriesId(seriesNavData.getSeriesId())
+                        .series(Series.builder()
+                                .id(seriesNavData.getSeriesId())
+                                .title(seriesNavData.getTitle())
+                                .build())
+
+                ;
+            }
+            //处理url
+            //获取所有图片信息
+            Request request2 = PixivRequestFactory.getPixivRequest()
+                    .url("https://www.pixiv.net/ajax/illust/" + illustId + "/pages")
+                    .get()
+                    .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Edg/107.0.1418.56")
+                    .buildRequest();
+            String s = Call.doCallGetString(request2);
+            ONode node2 = ONode.loadStr(s);
+            Boolean error = node2.get("error").getRawBoolean();
+            if (!error) {
+                List<WebAjaxUrl> body2 = node2.get("body").toObjectList(WebAjaxUrl.class);
+                int index = 0;
+                List<ImageUrl> list = new ArrayList<>();
+                for (WebAjaxUrl webAjaxUrl : body2) {
+                    ImageUrl imageUrl = ImageUrl.builder()
+                            .thumbMini(
+                                    ImageUrlDetail.builder()
+                                            .illustId(illustId)
+                                            .index(index)
+                                            .type(0)
+                                            .url(webAjaxUrl.getUrls().getThumbMini())
+                                            .state(0)
+                                            .build()
+                            )
+                            .medium(
+                                    ImageUrlDetail.builder()
+                                            .illustId(illustId)
+                                            .index(index)
+                                            .type(3)
+                                            .url(webAjaxUrl.getUrls().getSmall())
+                                            .state(0)
+                                            .build()
+                            )
+                            .regular(
+                                    ImageUrlDetail.builder()
+                                            .illustId(illustId)
+                                            .index(index)
+                                            .type(5)
+                                            .url(webAjaxUrl.getUrls().getRegular())
+                                            .state(0)
+                                            .build()
+                            )
+                            .original(
+                                    ImageUrlDetail.builder()
+                                            .illustId(illustId)
+                                            .index(index)
+                                            .type(6)
+                                            .url(webAjaxUrl.getUrls().getOriginal())
+                                            .height(webAjaxUrl.getHeight())
+                                            .width(webAjaxUrl.getWidth())
+                                            .state(0)
+                                            .build()
+                            )
+                            .build();
+                    list.add(imageUrl);
+                    index++;
+                }
+                builder.urls(list);
+                builder.state(0);
+            } else {
+                builder.state(-1);
+            }
+            return builder.build();
+        } else {
+            return Illust.builder()
+                    .id(illustId)
+                    .state(-1)
+                    .webRaw(node.toJson())
+                    .build();
+        }
+    }
+
     private Integer convertType(String type) {
 //        if ()
         if ("illust".equals(type)) {
@@ -329,10 +469,7 @@ public class PixivClient {
 //                .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Edg/107.0.1418.56")
 //                .buildRequest();
 //        String result = Call.doCallGetString(request);
-//        System.out.println(result);
 //        TagInfo t = ONode.loadStr(result).toObject(TagInfo.class);
-//        System.out.println(t.getError());
-//        System.out.println(t.getBody());
 //    }
 
     public void printLoginInfo() {

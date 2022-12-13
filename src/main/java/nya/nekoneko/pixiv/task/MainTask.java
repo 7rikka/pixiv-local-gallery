@@ -59,71 +59,85 @@ public class MainTask implements IJob {
         for (int i = 100000000; i >= 99999000; i--) {
             try {
                 log.info("获取插画信息, id: {}", i);
-                Illust illustDetail = client.getIllustDetail(i);
-                if (0 == illustDetail.getState()) {
-                    //正常 直接保存
-                    illustService.save(illustDetail);
-                } else {
-                    //当前失效
-                    Illust illust = illustMapper.selectById(i);
-                    if (null == illust) {
-                        //新增保存
+                Illust illustDetail1 = client.getIllustDetail(i);
+                Illust illustDetail2 = client.getIllustDetailWeb(i);
+                List<Illust> illustList = List.of(illustDetail1, illustDetail2);
+                for (Illust illustDetail : illustList) {
+                    log.info("state: {}", illustDetail.getState());
+                    if (0 == illustDetail.getState()) {
+                        //正常 直接保存
                         illustService.save(illustDetail);
                     } else {
-                        if (illust.getState() == 0) {
-                            //原来是正常的
-                            //更新保存
-                            Illust build = Illust.builder().id(i).state(-2).build();
-                            illustMapper.updateById(build);
+                        //当前失效
+                        Illust illust = illustMapper.selectById(i);
+                        if (null == illust) {
+                            //新增保存
+                            illustService.save(illustDetail);
                         } else {
-                            //原来是非正常
-                            Illust build = Illust.builder().id(i).build();
-                            illustMapper.updateById(build);
+                            if (illust.getState() == 0) {
+                                //原来是正常的
+                                //更新保存
+                                Illust build = Illust.builder().id(i).state(-2).build();
+                                illustMapper.updateById(build);
+                            } else {
+                                //原来是非正常
+                                Illust build = Illust.builder().id(i).build();
+                                illustMapper.updateById(build);
+                            }
                         }
                     }
-                }
-                //处理其他信息
-                if (0 == illustDetail.getState()) {
+                    //处理其他信息
+//                    if (0 == illustDetail.getState()) {
                     //处理tool
                     List<String> tools = illustDetail.getTools();
-                    for (String tool : tools) {
-                        toolService.save(Tool.builder().illustId(i).name(tool).build());
+                    if (null != tools) {
+                        for (String tool : tools) {
+                            toolService.save(Tool.builder().illustId(i).name(tool).build());
+                        }
                     }
+
                     //图片信息
                     List<ImageUrl> urls = illustDetail.getUrls();
-                    for (ImageUrl url : urls) {
-                        imageUrlDetailService.save(url.getMini());
-                        imageUrlDetailService.save(url.getThumb());
-                        imageUrlDetailService.save(url.getSmall());
-                        imageUrlDetailService.save(url.getRegular());
-                        imageUrlDetailService.save(url.getSquareMedium());
-                        imageUrlDetailService.save(url.getMedium());
-                        imageUrlDetailService.save(url.getLarge());
-                        imageUrlDetailService.save(url.getOriginal());
+                    if (null != urls) {
+                        for (ImageUrl url : urls) {
+                            imageUrlDetailService.save(url.getThumbMini());
+//                        imageUrlDetailService.save(url.getThumb());
+//                        imageUrlDetailService.save(url.getSmall());
+                            imageUrlDetailService.save(url.getRegular());
+                            imageUrlDetailService.save(url.getSquareMedium());
+                            imageUrlDetailService.save(url.getMedium());
+                            imageUrlDetailService.save(url.getLarge());
+                            imageUrlDetailService.save(url.getOriginal());
+                        }
                     }
+
                     //Tag
                     List<Tag> tags1 = illustDetail.getTags();
-                    for (Tag tag : tags1) {
-                        //保存Tag
-                        if (!tagMap.containsKey(tag.getName())) {
-                            tagService.save(tag);
-                            Tag tag1 = tagService.get(tag.getName());
-                            log.info("获取Tag: {}", tag1);
-                            tagMap.put(tag1.getName(), tag1);
+                    if (null != tags1) {
+                        for (Tag tag : tags1) {
+                            //保存Tag
+                            if (!tagMap.containsKey(tag.getName())) {
+                                tagService.save(tag);
+                                Tag tag1 = tagService.get(tag.getName());
+                                log.info("获取Tag: {}", tag1);
+                                tagMap.put(tag1.getName(), tag1);
+                            }
+                            //保存Tag关联
+                            Tag tag1 = tagMap.get(tag.getName());
+                            if (null == tag1) {
+                                log.info("手动获取Tag: {}", tag.getName());
+                                tag1 = tagService.get(tag.getName());
+                            }
+                            tagRelationService.save(TagRelation.builder().illustId(i).tagId(tag1.getId()).build());
                         }
-                        //保存Tag关联
-                        Tag tag1 = tagMap.get(tag.getName());
-                        if (null == tag1) {
-                            log.info("手动获取Tag: {}", tag.getName());
-                            tag1 = tagService.get(tag.getName());
-                        }
-                        tagRelationService.save(TagRelation.builder().illustId(i).tagId(tag1.getId()).build());
                     }
                     //用户
                     userService.save(illustDetail.getUser());
                     //系列
                     seriesService.save(illustDetail.getSeries());
+//                    }
                 }
+
             } catch (Exception e) {
                 log.error("错误：", e);
                 System.exit(0);

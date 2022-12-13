@@ -2,7 +2,7 @@ solon.app:
   name: pixiv-local-gallery
 solon.logging.appender:
   console:
-    level: DEBUG
+    level: INFO
     pattern: "%d{yyyy-MM-dd HH:mm:ss} %-5level %white(-) %-30(%cyan(%.32logger{30}:%L)) %msg%n"
   file:
     name: "logs/${solon.app.name}"

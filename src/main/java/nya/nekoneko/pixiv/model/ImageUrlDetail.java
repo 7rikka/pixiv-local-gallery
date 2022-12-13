@@ -37,14 +37,12 @@ public class ImageUrlDetail {
     private Integer index;
     /**
      * 类型
-     * 0：mini
-     * 1：thumb
-     * 2：small
-     * 3：regular
-     * 4：square_medium
-     * 5：medium
-     * 6：large
-     * 7：original
+     * 0：thumb_mini
+     * 1：square_medium
+     * 2：medium
+     * 3：large
+     * 4：regular
+     * 5：original
      */
     @TableField(value = "type")
     private Integer type;

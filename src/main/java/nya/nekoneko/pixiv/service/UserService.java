@@ -15,6 +15,9 @@ public class UserService {
     private UserMapper userMapper;
 
     public void save(User user) {
+        if (null == user) {
+            return;
+        }
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(User::getId, user.getId());
         if (!userMapper.exists(wrapper)) {
