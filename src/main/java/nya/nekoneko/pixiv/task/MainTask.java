@@ -60,8 +60,8 @@ public class MainTask implements IJob {
             try {
                 log.info("获取插画信息, id: {}", i);
                 Illust illustDetail1 = client.getIllustDetail(i);
-                Illust illustDetail2 = client.getIllustDetailWeb(i);
-                List<Illust> illustList = List.of(illustDetail1, illustDetail2);
+                List<Illust> illustList = client.getIllustDetailWeb(i);
+                illustList.add(0, illustDetail1);
                 for (Illust illustDetail : illustList) {
                     log.info("state: {}", illustDetail.getState());
                     if (0 == illustDetail.getState()) {
@@ -87,6 +87,9 @@ public class MainTask implements IJob {
                         }
                     }
                     //处理其他信息
+                    if (-1 == illustDetail.getState()) {
+                        continue;
+                    }
 //                    if (0 == illustDetail.getState()) {
                     //处理tool
                     List<String> tools = illustDetail.getTools();

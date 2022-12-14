@@ -6,10 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nya.nekoneko.pixiv.model.*;
 import nya.nekoneko.pixiv.model.app.*;
-import nya.nekoneko.pixiv.model.web.WebAjaxUrl;
-import nya.nekoneko.pixiv.model.web.WebBody;
-import nya.nekoneko.pixiv.model.web.WebSeriesNavData;
-import nya.nekoneko.pixiv.model.web.WebTag;
+import nya.nekoneko.pixiv.model.web.*;
 import nya.nekoneko.pixiv.util.Call;
 import nya.nekoneko.pixiv.util.PixivRequestFactory;
 import nya.nekoneko.pixiv.util.TimeUtils;
@@ -305,7 +302,8 @@ public class PixivClient {
 
     }
 
-    public Illust getIllustDetailWeb(int illustId) {
+    public List<Illust> getIllustDetailWeb(int illustId) {
+        List<Illust> illustList = new ArrayList<>();
         Request request = PixivRequestFactory.getPixivRequest()
                 .url("https://www.pixiv.net/ajax/illust/" + illustId)
                 .get()
@@ -313,6 +311,7 @@ public class PixivClient {
                 .buildRequest();
 
         String result = Call.doCallGetString(request);
+        System.out.println(result);
         ONode node = ONode.loadStr(result);
         if (!node.get("error").getRawBoolean()) {
             ONode bodyNode = node.get("body");
@@ -432,13 +431,57 @@ public class PixivClient {
             } else {
                 builder.state(-1);
             }
-            return builder.build();
+            illustList.add(builder.build());
+
+            //处理userIllusts
+            System.out.println("处理userIllusts");
+            ONode userIllusts = bodyNode.get("userIllusts");
+            userIllusts.forEach((k, v) -> {
+                if (!v.isNull()) {
+                    WebSubBody w = v.toObject(WebSubBody.class);
+                    String createDate2 = v.get("createDate").getRawString();
+                    System.out.println(createDate2);
+                    String uploadDate2 = v.get("updateDate").getRawString();
+                    System.out.println(uploadDate2);
+                    Illust.IllustBuilder builder2 = Illust.builder()
+                            .id(w.getId())
+                            .title(w.getTitle())
+                            .type(w.getIllustType())
+//                            .description(w.getDescription())
+                            .restrict(w.getRestrict())
+                            .xRestrict(w.getXRestrict())
+                            .userId(w.getUserId())
+                            .createDate(TimeUtils.toBeijingTime(createDate2))
+                            .uploadDate(TimeUtils.toBeijingTime(uploadDate2))
+                            .pageCount(w.getPageCount())
+                            .width(w.getWidth())
+                            .height(w.getHeight())
+                            .sanityLevel(w.getSl())
+                            .aiType(w.getAiType())
+                            .illustBookStyle(w.getIllustType())
+                            .state(-2)
+                            .webRaw(v.toJson());
+                    List<String> tags1 = w.getTags();
+                    if (null != tags1) {
+                        List<Tag> tagsList = new ArrayList<>();
+                        for (String tagName : tags1) {
+                            tagsList.add(Tag.builder()
+                                    .name(tagName)
+                                    .build());
+                        }
+                        builder2.tags(tagsList);
+                    }
+                    illustList.add(builder2.build());
+                }
+            });
+            return illustList;
         } else {
-            return Illust.builder()
+            illustList.add(Illust.builder()
                     .id(illustId)
                     .state(-1)
                     .webRaw(node.toJson())
-                    .build();
+                    .build());
+            return illustList;
         }
     }
 
