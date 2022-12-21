@@ -140,8 +140,15 @@ public class PixivClient {
                 .header("Authorization", "Bearer " + accessToken)
                 .buildRequest();
         String result = Call.doCallGetString(request);
+        System.out.println(result);
         ONode node = ONode.loadStr(result);
         ONode illustNode = node.get("illust");
+        String errorMessage = node.get("error").get("message").getRawString();
+        if (result.contains("Rate Limit")) {
+            log.info("Rate Limit!!!");
+            log.info(result);
+            System.exit(0);
+        }
         if (!illustNode.isNull()) {
 
             AppIllust appIllust = illustNode.toObject(AppIllust.class);
@@ -172,9 +179,9 @@ public class PixivClient {
                     .appRaw(node.toJson());
             //总体状态
             if (appIllust.getRestrict() != 0 || !appIllust.getVisible()) {
-                illustBuilder.state(-1);
+                illustBuilder.appState(-1);
             } else {
-                illustBuilder.state(0);
+                illustBuilder.appState(0);
             }
             //处理url
             List<ImageUrl> list = new ArrayList<>();
@@ -295,7 +302,7 @@ public class PixivClient {
             //{"error":{"user_message":"","message":"Rate Limit","reason":"","user_message_details":{}}}
             return Illust.builder()
                     .id(illustId)
-                    .state(-1)
+                    .appState(-1)
                     .appRaw(node.toJson())
                     .build();
         }
@@ -365,7 +372,6 @@ public class PixivClient {
                                 .id(seriesNavData.getSeriesId())
                                 .title(seriesNavData.getTitle())
                                 .build())
-
                 ;
             }
             //处理url
@@ -427,9 +433,9 @@ public class PixivClient {
                     index++;
                 }
                 builder.urls(list);
-                builder.state(0);
+                builder.webState(0);
             } else {
-                builder.state(-1);
+                builder.webState(-1);
             }
             illustList.add(builder.build());
 
@@ -459,7 +465,7 @@ public class PixivClient {
                             .sanityLevel(w.getSl())
                             .aiType(w.getAiType())
                             .illustBookStyle(w.getIllustType())
-                            .state(-2)
+                            .webState(-2)
                             .webRaw(v.toJson());
                     List<String> tags1 = w.getTags();
                     if (null != tags1) {
@@ -478,7 +484,7 @@ public class PixivClient {
         } else {
             illustList.add(Illust.builder()
                     .id(illustId)
-                    .state(-1)
+                    .webState(-1)
                     .webRaw(node.toJson())
                     .build());
             return illustList;

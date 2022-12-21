@@ -187,12 +187,23 @@ public class Illust {
     @ONodeAttr(name = "update_time")
     private LocalDateTime updateTime;
     /**
-     * 插画总体状态
+     * App插画总体状态
      * 0：正常
      * -1：无效
+     * -2: 同作者关联
+     * -3：失效
      */
-    @ONodeAttr(name = "state")
-    private Integer state;
+    @ONodeAttr(name = "app_state")
+    private Integer appState;
+    /**
+     * Web插画总体状态
+     * 0：正常
+     * -1：无效
+     * -2: 同作者关联
+     * -3：失效
+     */
+    @ONodeAttr(name = "web_state")
+    private Integer webState;
     /**
      * App Api 返回 Json
      */

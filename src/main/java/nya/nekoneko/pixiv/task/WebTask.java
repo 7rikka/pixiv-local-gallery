@@ -7,6 +7,7 @@ import nya.nekoneko.pixiv.mapper.TagMapper;
 import nya.nekoneko.pixiv.model.*;
 import nya.nekoneko.pixiv.service.*;
 import org.apache.ibatis.solon.annotation.Db;
+import org.noear.solon.annotation.Component;
 import org.noear.solon.annotation.Inject;
 import org.noear.solon.extend.schedule.IJob;
 
@@ -18,8 +19,8 @@ import java.util.Map;
  * @author Ho
  */
 @Slf4j
-//@Component
-public class MainTask implements IJob {
+@Component
+public class WebTask implements IJob {
     @Inject
     private PixivClient client;
     @Db
@@ -47,7 +48,7 @@ public class MainTask implements IJob {
     }
 
     @Override
-    public void exec() {
+    public void exec() throws Throwable {
         log.info("获取Tag信息");
         Map<String, Tag> tagMap = new HashMap<>();
         List<Tag> tags = tagMapper.selectList(null);
@@ -58,35 +59,35 @@ public class MainTask implements IJob {
         for (int i = 100000000; i >= 0; i--) {
             try {
                 log.info("获取插画信息, id: {}", i);
-                Illust illustDetail1 = client.getIllustDetail(i);
                 List<Illust> illustList = client.getIllustDetailWeb(i);
-                illustList.add(0, illustDetail1);
                 for (Illust illustDetail : illustList) {
-                    log.info("state: {} {}", illustDetail.getAppState(), illustDetail.getWebState());
-                    if (0 == illustDetail.getAppState() || 0 == illustDetail.getWebState()) {
-                        //正常 直接保存
+                    Integer currentIllustId = illustDetail.getId();
+                    log.info("id: {}", currentIllustId);
+                    log.info("state: {}", illustDetail.getWebState());
+                    if (0 == illustDetail.getWebState()) {
+                        //正常或同作者 直接保存
                         illustService.save(illustDetail);
                     } else {
                         //当前失效
-                        Illust illust = illustMapper.selectById(i);
+                        Illust illust = illustMapper.selectById(currentIllustId);
                         if (null == illust) {
                             //新增保存
                             illustService.save(illustDetail);
                         } else {
-                            if (0 == illustDetail.getAppState() || 0 == illustDetail.getWebState()) {
+                            if (0 == illustDetail.getWebState()) {
                                 //原来是正常的
                                 //更新保存
-                                Illust build = Illust.builder().id(i).appState(-3).webState(-3).build();
+                                Illust build = Illust.builder().id(currentIllustId).webState(-3).build();
                                 illustMapper.updateById(build);
                             } else {
                                 //原来是非正常
-                                Illust build = Illust.builder().id(i).build();
+                                Illust build = Illust.builder().id(currentIllustId).build();
                                 illustMapper.updateById(build);
                             }
                         }
                     }
                     //处理其他信息
-                    if (-1 == illustDetail.getAppState()) {
+                    if (-1 == illustDetail.getWebState()) {
                         continue;
                     }
 //                    if (0 == illustDetail.getState()) {
@@ -94,7 +95,7 @@ public class MainTask implements IJob {
                     List<String> tools = illustDetail.getTools();
                     if (null != tools) {
                         for (String tool : tools) {
-                            toolService.save(Tool.builder().illustId(i).name(tool).build());
+                            toolService.save(Tool.builder().illustId(currentIllustId).name(tool).build());
                         }
                     }
 
@@ -130,7 +131,7 @@ public class MainTask implements IJob {
                                 log.info("手动获取Tag: {}", tag.getName());
                                 tag1 = tagService.get(tag.getName());
                             }
-                            tagRelationService.save(TagRelation.builder().illustId(i).tagId(tag1.getId()).build());
+                            tagRelationService.save(TagRelation.builder().illustId(currentIllustId).tagId(tag1.getId()).build());
                         }
                     }
                     //用户
@@ -139,7 +140,7 @@ public class MainTask implements IJob {
                     seriesService.save(illustDetail.getSeries());
 //                    }
                 }
-
+                log.info("获取插画信息, id: {} 完成", i);
             } catch (Exception e) {
                 log.error("错误：", e);
                 System.exit(0);
